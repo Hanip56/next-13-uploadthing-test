@@ -54,15 +54,14 @@ export const options: NextAuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      return { ...token, ...user };
-    },
-    async session({ session, token, user }) {
-      session.user = token as any;
-      return session;
-    },
-  },
+  // callbacks: {
+  //   async jwt({ token, user }) {
+  //     return token
+  //   },
+  //   async session({ session, token, user }) {
+  //     return session;
+  //   },
+  // },
   pages: {
     signIn: "/login",
   },
