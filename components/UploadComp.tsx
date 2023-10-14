@@ -5,29 +5,32 @@ import { Button } from "./ui/button";
 import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useUploadThing } from "@/lib/uploadthing";
 
 const UploadComp = () => {
   const [file, setFile] = useState<File>();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { startUpload } = useUploadThing("imageUploader");
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async () => {
     if (!file) return;
     setIsLoading(true);
+    const imgRes = await startUpload([file]);
+    if (imgRes && imgRes[0].key) {
+      console.log("image uploaded");
 
-    const formData = new FormData();
+      const res = await axios.post("/api/upload", { image: imgRes[0].key });
+      console.log(res);
 
-    formData.set("file", file);
-
-    const res = await axios.post("/api/upload", formData);
-    console.log(res);
-
-    if ("data" in res) {
-      setFile(undefined);
-      router.refresh();
+      if ("data" in res) {
+        setFile(undefined);
+        router.refresh();
+      }
     }
+
     setIsLoading(false);
   };
 

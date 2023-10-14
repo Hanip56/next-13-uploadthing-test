@@ -2,11 +2,9 @@ import ImageItem from "@/components/ImageItem";
 import Navbar from "@/components/Navbar";
 import UploadComp from "@/components/UploadComp";
 import UserCard from "@/components/UserCard";
-import { Button } from "@/components/ui/button";
 import prisma from "@/lib/db";
 import { options } from "@/lib/nextAuthOptions";
 import { getServerSession } from "next-auth";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";
 

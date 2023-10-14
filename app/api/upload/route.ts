@@ -1,9 +1,7 @@
 import prisma from "@/lib/db";
-import { existsSync } from "fs";
-import { unlink, writeFile } from "fs/promises";
+import { utapi } from "@/lib/uploadThingServer";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import path from "path";
 
 export async function PATCH(req: Request) {
   const { filename } = await req.json();
@@ -28,11 +26,10 @@ export async function PATCH(req: Request) {
   }
 
   try {
-    const filePath = path.join(process.cwd(), "public", filename);
-    if (existsSync(filePath)) {
-      await unlink(filePath);
-    }
-    const updatedUser = await prisma.user.update({
+    const uploadThingRes = await utapi.deleteFiles(filename);
+    console.log({ uploadThingRes });
+
+    await prisma.user.update({
       where: {
         email: session.user.email,
       },
@@ -56,11 +53,11 @@ export async function POST(req: Request) {
   }
 
   try {
-    const data = await req.formData();
-    const file: File | null = data.get("file") as unknown as File;
+    const body = await req.json();
+    const { image } = body;
 
-    if (!file) {
-      return new NextResponse("Error no file selected", { status: 400 });
+    if (!image) {
+      return new NextResponse("Image is required", { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -73,21 +70,12 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = `${uniqueSuffix}-${file.name}`;
-
-    const destinationPath = path.join(process.cwd(), "public", filename);
-    await writeFile(destinationPath, buffer);
-
     const updatedUser = await prisma.user.update({
       where: {
         email: session.user.email,
       },
       data: {
-        uploaded: [...user.uploaded, filename],
+        uploaded: [...user.uploaded, image],
       },
     });
 

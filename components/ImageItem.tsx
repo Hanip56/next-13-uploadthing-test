@@ -21,8 +21,10 @@ import { useState } from "react";
 function ImageItem({ src }: { src: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
   const handleDelete = async () => {
     setIsLoading(true);
+
     const res = await axios.patch("/api/upload", { filename: src });
 
     if ("data" in res) {
@@ -65,7 +67,7 @@ function ImageItem({ src }: { src: string }) {
       </AlertDialog>
       <Image
         className="w-full h-full object-cover"
-        src={`/${src}`}
+        src={`https://utfs.io/f/${src}`}
         alt={src}
         width={200}
         height={200}

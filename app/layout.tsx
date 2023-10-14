@@ -4,6 +4,11 @@ import { Inter } from "next/font/google";
 import SessionProvider from "@/components/SessionProvider";
 import { getServerSession } from "next-auth";
 import { options } from "@/lib/nextAuthOptions";
+// uploadthing
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +27,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <SessionProvider session={session}>
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+          {children}
+        </body>
       </SessionProvider>
     </html>
   );
